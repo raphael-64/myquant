@@ -5,6 +5,7 @@ from datetime import datetime
 import requests
 import numpy as np
 
+
 try:
     from transformers import AutoTokenizer, AutoModelForSequenceClassification
     import torch
@@ -15,6 +16,7 @@ except ImportError:
 
 class SentimentRequest(Model):
     ticker: str
+    timestamp: str           # trying this shit
 
 class SentimentResponse(Model):
     ticker: str
@@ -145,7 +147,7 @@ async def handle_request(ctx: Context, sender: str, msg: SentimentRequest):
     try:
         # Get news sentiment analysis
         sentiment_data = analyze_news_sentiment(msg.ticker)
-        timestamp = datetime.now().isoformat()
+        timestamp = msg.timestamp
         
         # Send response back
         await ctx.send(
@@ -153,8 +155,8 @@ async def handle_request(ctx: Context, sender: str, msg: SentimentRequest):
             SentimentResponse(
                 ticker=msg.ticker,
                 timestamp=timestamp,
-                sentiment_score=sentiment_data["sentiment_score"],
-                sentiment_magnitude=sentiment_data["sentiment_magnitude"],
+                sentiment_score=float(sentiment_data["sentiment_score"]),
+                sentiment_magnitude=float(sentiment_data["sentiment_magnitude"]),
                 news_count=sentiment_data["news_count"]
             )
         )

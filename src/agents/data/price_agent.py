@@ -1,6 +1,6 @@
 from uagents import Agent, Context, Model
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timezone
 from uagents.setup import fund_agent_if_low
 
 
@@ -43,7 +43,7 @@ async def handle_request(ctx: Context, sender: str, msg: PriceRequest):
         stock = yf.Ticker(msg.ticker)
         
         # Get more comprehensive market data
-        current_price = stock.info.get('currentPrice', 0)
+        current_price = stock.info.get('currentPrice')
         if current_price == 0:  # Sometimes yfinance returns currentPrice as 0
             current_price = stock.info.get('regularMarketPrice', 0)
             ctx.logger.info(f"Using regularMarketPrice: {current_price}")
@@ -52,15 +52,20 @@ async def handle_request(ctx: Context, sender: str, msg: PriceRequest):
             
         currency = stock.info.get('currency', 'USD')
         volume = stock.info.get('volume', 0)
-        timestamp = datetime.now().isoformat()
+
+        
+        # timestamp = datetime.now().isoformat()    # 1. generate a single, UTC, second‐precision timestamp
+        ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
         
         ctx.logger.info(f"Data fetched successfully: {current_price} {currency}, volume: {volume}")
         
         # Prepare response
         response = PriceResponse(
             ticker=msg.ticker,
-            timestamp=timestamp,
-            current_price=current_price,
+            timestamp=ts,
+            current_price=float(current_price),
             currency=currency,
             volume=volume
         )

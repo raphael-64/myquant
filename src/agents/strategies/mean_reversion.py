@@ -71,10 +71,10 @@ class MeanReversionAgent(BaseStrategyAgent):
             action = "hold"
             target_price = current_price
             confidence = 0.5
-        
+        print(z_score)
         # Calculate additional statistical metrics for reasoning
         p_value = 2 * (1 - stats.norm.cdf(abs(z_score)))  # Two-tailed p-value
-        
+        print(p_value)
         # Prepare prediction and reasoning
         prediction = {
             "action": action,
