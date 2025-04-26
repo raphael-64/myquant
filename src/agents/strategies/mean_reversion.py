@@ -40,14 +40,14 @@ class MeanReversionAgent(BaseStrategyAgent):
             )
         
         # Extract closing prices from historical data
-        prices = [data.get("price", 0) for data in historical_data]
+        prices = [float(data.get("price", 0)) for data in historical_data]
         
         # Calculate mean and standard deviation
-        mean_price = np.mean(prices)
-        std_price = np.std(prices)
+        mean_price = float(np.mean(prices))
+        std_price = float(np.std(prices))
         
         # Get current price
-        current_price = current_data.get("price", 0)
+        current_price = float(current_data.get("price", 0))
         
         # Calculate Z-score (how many standard deviations from the mean)
         if std_price == 0:  # Avoid division by zero
@@ -60,12 +60,12 @@ class MeanReversionAgent(BaseStrategyAgent):
             # Price is significantly above mean, expect reversion downward
             action = "sell"
             target_price = mean_price
-            confidence = min(0.9, abs(z_score) / 5)  # Scale confidence based on deviation
+            confidence = min(0.9, abs(z_score) / 5.0)  # Scale confidence based on deviation
         elif z_score < -self.z_score_threshold:
             # Price is significantly below mean, expect reversion upward
             action = "buy"
             target_price = mean_price
-            confidence = min(0.9, abs(z_score) / 5)  # Scale confidence based on deviation
+            confidence = min(0.9, abs(z_score) / 5.0)  # Scale confidence based on deviation
         else:
             # Price is within normal range
             action = "hold"

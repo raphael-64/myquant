@@ -45,8 +45,8 @@ class MomentumAgent(BaseStrategyAgent):
         sorted_data = sorted(historical_data, key=lambda x: x.get("timestamp", ""))
         
         # Extract closing prices
-        prices = np.array([data.get("price", 0) for data in sorted_data])
-        current_price = current_data.get("price", 0)
+        prices = np.array([float(data.get("price", 0)) for data in sorted_data])
+        current_price = float(current_data.get("price", 0))
         
         # Calculate returns for different windows
         short_return = self._calculate_return(prices, self.short_window)

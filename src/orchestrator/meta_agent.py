@@ -86,13 +86,22 @@ PENDING_REGISTRATIONS = []
 
 # Database connection
 def get_db_connection():
-    return psycopg2.connect(
+    conn =  psycopg2.connect(
         dbname=os.getenv("DB_NAME", "myquant"),
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD", ""),
         host=os.getenv("DB_HOST", "localhost"),
         port=os.getenv("DB_PORT", "5432")
     )
+    DEC2FLOAT = psycopg2.extensions.new_type(
+        psycopg2.extensions.DECIMAL.values,
+        'DEC2FLOAT',
+        lambda value, curs: float(value) if value is not None else None
+    )
+    psycopg2.extensions.register_type(DEC2FLOAT)
+
+    return conn
+    
 
 # Initialize the database
 def init_db():
@@ -197,7 +206,7 @@ def init_db():
 # Initialize DB on startup
 init_db()
 
-@meta_agent.on_interval(period=3600.0)  # Run every hour
+@meta_agent.on_interval(period=30.0)  # Run every 30 seconds
 async def analyze_investments(ctx: Context):
     """Main analysis loop that runs periodically"""
     # Get list of assets to analyze from database

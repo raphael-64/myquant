@@ -46,11 +46,11 @@ class SentimentMomentumAgent(BaseStrategyAgent):
         sorted_data = sorted(historical_data, key=lambda x: x.get("timestamp", ""))
         
         # Extract sentiment and price data
-        current_sentiment = current_data.get("sentiment_score", 0)
-        current_price = current_data.get("price", 0)
+        current_sentiment = float(current_data.get("sentiment_score", 0))
+        current_price = float(current_data.get("price", 0))
         
         prices = [data.get("price", 0) for data in sorted_data[-self.momentum_window:]]
-        sentiments = [data.get("sentiment_score", 0) for data in sorted_data[-self.sentiment_window:]]
+        sentiments = [float(data.get("sentiment_score", 0)) for data in sorted_data[-self.sentiment_window:]]
         
         # Calculate price momentum (percent change)
         start_price = prices[0] if prices else 0
