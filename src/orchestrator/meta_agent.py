@@ -88,10 +88,10 @@ PENDING_REGISTRATIONS = []
 def get_db_connection():
     return psycopg2.connect(
         dbname=os.getenv("DB_NAME", "myquant"),
-        user=os.getenv("DS_USER", "postgres"),
-        password=os.getenv("DS_PASSWORD", ""),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", ""),
         host=os.getenv("DB_HOST", "localhost"),
-        post=os.getenv("DS_PORT", "5432")
+        port=os.getenv("DB_PORT", "5432")
     )
 
 # Initialize the database
