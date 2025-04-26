@@ -74,21 +74,24 @@ DATA_AGENTS = {
 
 # Strategy agent addresses - WILL BE STABLE WITH SEED PHRASES
 STRATEGY_AGENTS = {
-    # Get these values from console output when running agents
+    # Get these values from console  output when running agents
     "mean_reversion": "agent1qvx5w6z9f38t9m85k2nqzdsdh3auz30ag6szkkuyrr3lmtsmstssxrfk7l",
     "momentum": "agent1qwu2l8ayyr5xztyqqwpukzsrkyhd4t2g3s7jcduvn53qp0he5tjnq9gq4k",
     "sentiment_momentum": "agent1q0hwxnluasmvhlcxpcv2rj5zr4wpagrc6t8dzhwz42rk4k9v6drvkgn05d",
 }
+
+PENDING_REGISTRATIONS = []
 
 # Run the agents and update the addresses before starting the meta agent
 
 # Database connection
 def get_db_connection():
     return psycopg2.connect(
-        dbname="investment_db",
-        user="raphael",
-        password="",
-        host="localhost"
+        dbname=os.getenv("DB_NAME", "myquant"),
+        user=os.getenv("DS_USER", "postgres"),
+        password=os.getenv("DS_PASSWORD", ""),
+        host=os.getenv("DB_HOST", "localhost"),
+        post=os.getenv("DS_PORT", "5432")
     )
 
 # Initialize the database
@@ -246,7 +249,10 @@ async def handle_price_data(ctx: Context, sender: str, msg: PriceResponse):
     # Request sentiment analysis
     await ctx.send(
         DATA_AGENTS["sentiment"],
-        SentimentRequest(ticker=msg.ticker)
+        SentimentRequest(
+            ticker=msg.ticker,
+            timestamp=msg.timestamp
+        )
     )
 
 # Handle sentiment response
@@ -423,7 +429,12 @@ async def perform_analysis(ctx: Context, asset_id: str, timestamp: str):
                 ctx.logger.warning(f"No market data available for {asset_id}")
                 return
             
+
+
+            
             price, volume, sentiment_score, sentiment_magnitude, currency, data_timestamp = latest_data
+
+            ctx.logger.info(f"[DEBUG] Latest market_data row for {asset_id}: " f"price={price!r}, sentiment={sentiment_score!r}, ts={data_timestamp!r}")
             
             # Get historical data
             cur.execute("""
@@ -634,10 +645,23 @@ async def make_meta_decision(ctx: Context, asset_id: str, timestamp: str,
         weighted_predictions=weighted_predictions
     )
 
+
+@meta_agent.on_event("startup")
+async def register_agents(ctx: Context):
+    for address, endpoint in PENDING_REGISTRATIONS:
+        ctx.register(address, endpoint)
+    ctx.logger.info(f"Registered {len(PENDING_REGISTRATIONS)} strategy agents.")
+
+
+
 # testing this 
-def set_strategy_addresses(addresses):
+
+def set_strategy_addresses(addresses_and_endpoints):
     global STRATEGY_AGENTS
-    STRATEGY_AGENTS = addresses
+    STRATEGY_AGENTS.clear()
+
+    for strat_name, info in addresses_and_endpoints.items():
+        STRATEGY_AGENTS[strat_name] = info["address"]
 
 if __name__ == "__main__":
     meta_agent.run() 

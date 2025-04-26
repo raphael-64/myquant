@@ -10,6 +10,7 @@ import numpy as np
 
 class SentimentRequest(Model):
     ticker: str
+    timestamp: str           # trying this shit
 
 
 # class NewsSentiment(Model):
