@@ -102,7 +102,6 @@ def get_db_connection():
 
     return conn
     
-
 # Initialize the database
 def init_db():
     """Create tables if they don't exist"""
