@@ -1,0 +1,2 @@
+uagents==0.3.0
+fetchai-ledger-api==0.10.0 
