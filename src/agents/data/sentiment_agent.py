@@ -109,9 +109,10 @@ def analyze_news_sentiment(ticker: str) -> Dict:
     sentiment_scores = []
     for item in news[:15]:  # Get top 15 news items
         try:
-            summary = item.get('title', '')
+            summary = item.get('content', '').get('summary','')
+            print(summary)
             if 'summary' in item:
-                summary += " " + item.get('summary', '')
+                summary += " " + item.get('content', '').get('summary','')
                 
             # Analyze sentiment
             if FINBERT_AVAILABLE:
