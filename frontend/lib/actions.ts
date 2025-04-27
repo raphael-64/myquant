@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 // This file contains server actions for fetching stock data and managing user stocks
 
@@ -8,24 +8,24 @@ export async function getStockData(symbol: string) {
 
   try {
     // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Generate mock price data
     const data = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date()
-      date.setDate(date.getDate() - (30 - i))
+      const date = new Date();
+      date.setDate(date.getDate() - (30 - i));
 
       return {
         date: date.toISOString().split("T")[0],
         price: 100 + Math.random() * 50 + i * (Math.random() > 0.5 ? 1 : -0.5),
         volume: Math.floor(Math.random() * 10000000) + 1000000,
-      }
-    })
+      };
+    });
 
-    return { success: true, data }
+    return { success: true, data };
   } catch (error) {
-    console.error("Error fetching stock data:", error)
-    return { success: false, error: "Failed to fetch stock data" }
+    console.error("Error fetching stock data:", error);
+    return { success: false, error: "Failed to fetch stock data" };
   }
 }
 
@@ -35,24 +35,24 @@ export async function getStockSentiment(symbol: string) {
 
   try {
     // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 700))
+    await new Promise((resolve) => setTimeout(resolve, 700));
 
     // Generate mock sentiment data
     const data = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date()
-      date.setDate(date.getDate() - (30 - i))
+      const date = new Date();
+      date.setDate(date.getDate() - (30 - i));
 
       return {
         date: date.toISOString().split("T")[0],
         sentiment: Math.random() * 2 - 1, // -1 to 1
         articles: Math.floor(Math.random() * 50) + 5,
-      }
-    })
+      };
+    });
 
-    return { success: true, data }
+    return { success: true, data };
   } catch (error) {
-    console.error("Error fetching sentiment data:", error)
-    return { success: false, error: "Failed to fetch sentiment data" }
+    console.error("Error fetching sentiment data:", error);
+    return { success: false, error: "Failed to fetch sentiment data" };
   }
 }
 
@@ -62,28 +62,46 @@ export async function addStock(symbol: string) {
 
   try {
     // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 300))
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     // For demo purposes, we'll just return success
     // In a real app, you would validate the symbol exists
-    return { success: true }
+    return { success: true };
   } catch (error) {
-    console.error("Error adding stock:", error)
-    throw new Error("Failed to add stock")
+    console.error("Error adding stock:", error);
+    throw new Error("Failed to add stock");
+  }
+}
+export async function removeStock(ticker: string) {
+  const res = await fetch(`http://localhost:8000/assets/${ticker}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to remove stock");
   }
 }
 
-export async function removeStock(symbol: string) {
-  // In a real application, this would remove the stock from the user's database record
-
+export async function getMarketData(asset_id: string, limit: number = 100) {
   try {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    const res = await fetch(
+      `http://localhost:8000/market-data/${asset_id}?limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    // For demo purposes, we'll just return success
-    return { success: true }
+    if (!res.ok) {
+      throw new Error("Failed to fetch market data");
+    }
+
+    const data = await res.json();
+    return data; // returns an array of market data objects
   } catch (error) {
-    console.error("Error removing stock:", error)
-    throw new Error("Failed to remove stock")
+    console.error(error);
+    throw error;
   }
 }

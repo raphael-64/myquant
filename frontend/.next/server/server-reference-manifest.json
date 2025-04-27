@@ -3,7 +3,7 @@
     "402450bc27a46ddf8be58dbd3618b04ff3c535d60e": {
       "workers": {
         "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%5D%5D%5D&__client_imported__=true!",
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%2C%7B%22id%22%3A%2260d1b0b53d78f16333cd6ea3a845043dd06d95fd8d%22%2C%22exportedName%22%3A%22getMarketData%22%7D%5D%5D%5D&__client_imported__=true!",
           "async": false
         }
       },
@@ -14,7 +14,7 @@
     "407469aea8723a11e7ecaa55a6f6b04146c7fff3d2": {
       "workers": {
         "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%5D%5D%5D&__client_imported__=true!",
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%2C%7B%22id%22%3A%2260d1b0b53d78f16333cd6ea3a845043dd06d95fd8d%22%2C%22exportedName%22%3A%22getMarketData%22%7D%5D%5D%5D&__client_imported__=true!",
           "async": false
         }
       },
@@ -25,7 +25,7 @@
     "40a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65": {
       "workers": {
         "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%5D%5D%5D&__client_imported__=true!",
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%2C%7B%22id%22%3A%2260d1b0b53d78f16333cd6ea3a845043dd06d95fd8d%22%2C%22exportedName%22%3A%22getMarketData%22%7D%5D%5D%5D&__client_imported__=true!",
           "async": false
         }
       },
@@ -36,7 +36,18 @@
     "40f03781b88ab6a1a2eef5688e3e87852c9be85526": {
       "workers": {
         "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%5D%5D%5D&__client_imported__=true!",
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%2C%7B%22id%22%3A%2260d1b0b53d78f16333cd6ea3a845043dd06d95fd8d%22%2C%22exportedName%22%3A%22getMarketData%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    },
+    "60d1b0b53d78f16333cd6ea3a845043dd06d95fd8d": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fraphael%2FDocuments%2Fmyquant%2Ffrontend%2Flib%2Factions.ts%22%2C%5B%7B%22id%22%3A%22402450bc27a46ddf8be58dbd3618b04ff3c535d60e%22%2C%22exportedName%22%3A%22removeStock%22%7D%2C%7B%22id%22%3A%22407469aea8723a11e7ecaa55a6f6b04146c7fff3d2%22%2C%22exportedName%22%3A%22getStockSentiment%22%7D%2C%7B%22id%22%3A%2240a01c7f6cbb4e925fbef2f4ebcb9bf7e6c2a03b65%22%2C%22exportedName%22%3A%22getStockData%22%7D%2C%7B%22id%22%3A%2240f03781b88ab6a1a2eef5688e3e87852c9be85526%22%2C%22exportedName%22%3A%22addStock%22%7D%2C%7B%22id%22%3A%2260d1b0b53d78f16333cd6ea3a845043dd06d95fd8d%22%2C%22exportedName%22%3A%22getMarketData%22%7D%5D%5D%5D&__client_imported__=true!",
           "async": false
         }
       },

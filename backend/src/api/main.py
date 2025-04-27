@@ -1,5 +1,5 @@
 # src/api/main.py
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
@@ -7,6 +7,8 @@ import psycopg2
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+# import requests
+import yfinance as yf
 
 # Load environment variables
 load_dotenv()
@@ -20,22 +22,20 @@ print(f"DB_PORT: {os.getenv('DB_PORT')}")
 print(f"DB_PASSWORD is set: {'DB_PASSWORD' in os.environ}")
 
 app = FastAPI()
-
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your frontend domain
+    allow_origins=["http://localhost:3000"],  # frontend URL is fine
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # allow POST, GET, DELETE, etc
+    allow_headers=["*"],  # allow any headers
 )
 
 # Database connection
 def get_db_connection():
-    db_name = os.getenv("DB_NAME", "myquant")
-    db_user = os.getenv("DB_USER", "postgres")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "5432")
+    db_name = os.getenv("DB_NAME")
+    db_user = os.getenv("DB_USER")
+    db_host = os.getenv("DB_HOST")
+    db_port = os.getenv("DB_PORT")
     
     print(f"Attempting to connect to database:")
     print(f"Database: {db_name}")
@@ -59,7 +59,7 @@ def get_db_connection():
 # API Models
 class Asset(BaseModel):
     ticker: str
-    name: str
+    name: Optional[str] = None
     asset_type: str = "stock"
 
 class MarketData(BaseModel):
@@ -101,17 +101,23 @@ class Performance(BaseModel):
     actual_outcome: float
     performance_score: float
 
-# API Endpoints
+
+
 @app.post("/assets")
 async def create_asset(asset: Asset):
     conn = get_db_connection()
     try:
         with conn.cursor() as cur:
+            # 🛠 If no name provided, auto-fetch it
+            if not asset.name or asset.name.strip() == "":
+                asset.name = fetch_company_name(asset.ticker)
+
             cur.execute("""
                 INSERT INTO assets (ticker, name, asset_type)
                 VALUES (%s, %s, %s)
                 RETURNING ticker, name, asset_type
             """, (asset.ticker, asset.name, asset.asset_type))
+            
             result = cur.fetchone()
             conn.commit()
             return {"ticker": result[0], "name": result[1], "asset_type": result[2]}
@@ -143,6 +149,41 @@ async def get_asset(ticker: str):
     finally:
         conn.close()
 
+@app.delete("/assets/{ticker}")
+async def delete_asset(ticker: str):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cur:
+
+            # Step 1: Delete performance history first (because it depends on predictions)
+            cur.execute("""
+                DELETE FROM performance_history 
+                WHERE asset_id = %s 
+                OR prediction_id IN (
+                    SELECT id FROM predictions WHERE asset_id = %s
+                )
+            """, (ticker, ticker))
+            
+            # Step 2: Delete market data
+            cur.execute("DELETE FROM market_data WHERE asset_id = %s", (ticker,))
+            
+            # Step 3: Delete predictions
+            cur.execute("DELETE FROM predictions WHERE asset_id = %s", (ticker,))
+            
+            # Step 4: Delete decisions
+            cur.execute("DELETE FROM decisions WHERE asset_id = %s", (ticker,))
+            
+            # Step 5: Finally delete the asset itself
+            cur.execute("DELETE FROM assets WHERE ticker = %s RETURNING ticker", (ticker,))
+            
+            result = cur.fetchone()
+            if not result:
+                raise HTTPException(status_code=404, detail="Asset not found")
+            conn.commit()
+            return {"message": f"Asset '{ticker}' deleted successfully"}
+    finally:
+        conn.close()
+
 @app.post("/market-data")
 async def create_market_data(data: MarketData):
     conn = get_db_connection()
@@ -170,7 +211,7 @@ async def create_market_data(data: MarketData):
         conn.close()
 
 @app.get("/market-data/{asset_id}")
-async def get_market_data(asset_id: str, limit: int = 100):
+async def get_market_data(asset_id: str, limit: int = 30):
     conn = get_db_connection()
     try:
         with conn.cursor() as cur:
@@ -196,6 +237,8 @@ async def get_market_data(asset_id: str, limit: int = 100):
     finally:
         conn.close()
 
+
+
 @app.post("/predictions")
 async def create_prediction(prediction: Prediction):
     conn = get_db_connection()
@@ -216,8 +259,9 @@ async def create_prediction(prediction: Prediction):
     finally:
         conn.close()
 
+
 @app.get("/predictions/{asset_id}")
-async def get_predictions(asset_id: str, limit: int = 100):
+async def get_predictions(asset_id: str, limit: int = 30):
     conn = get_db_connection()
     try:
         with conn.cursor() as cur:
@@ -400,3 +444,35 @@ async def test_db():
     except Exception as e:
         print(f"\nError details: {str(e)}")
         return {"status": "error", "message": str(e)}
+    
+
+# helper shit
+# def fetch_company_name(ticker: str) -> str:
+#     url = f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{ticker}?modules=price"
+#     resp = requests.get(url)
+#     if resp.status_code != 200:
+#         raise HTTPException(status_code=400, detail="Failed to fetch company name")
+    
+#     data = resp.json()
+#     try:
+#         return data["quoteSummary"]["result"][0]["price"]["longName"]
+#     except (KeyError, IndexError, TypeError):
+#         raise HTTPException(status_code=400, detail="Invalid ticker or no company name found")
+def fetch_company_name(ticker: str) -> str:
+    """
+    Given a stock ticker, returns the company’s longName or shortName.
+    Raises HTTPException(400) if the ticker is invalid or name not found.
+    """
+    try:
+        tk = yf.Ticker(ticker)
+        info = tk.info  # pulls the “quoteSummary” data for you
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch data for {ticker}: {e}")
+
+    name = info.get("longName") or info.get("shortName")
+    if not name:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No company name found for ticker '{ticker}'"
+        )
+    return name
