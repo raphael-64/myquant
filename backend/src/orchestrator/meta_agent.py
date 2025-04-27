@@ -22,7 +22,6 @@ class AnalysisRequest(Model):
     asset_id: str
     timestamp: str
     current_data: Dict[str, Any]
-    historical_data: List[Dict[str, Any]]
     
 class StrategyResponse(Model):
     asset_id: str
@@ -274,7 +273,7 @@ async def handle_sentiment_data(ctx: Context, sender: str, msg: SentimentRespons
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO market_data 
+                INSERT INTO sentiment_data 
                 (asset_id, timestamp, sentiment_score, sentiment_magnitude)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (asset_id, timestamp) 
@@ -444,7 +443,7 @@ async def perform_analysis(ctx: Context, asset_id: str, timestamp: str):
 
 
             
-            price, volume, sentiment_score, sentiment_magnitude, currency, data_timestamp = latest_data
+            price, volume, sentiment_score, sentiment_magnitude, currency, data_timestamp= latest_data
 
             ctx.logger.info(f"[DEBUG] Latest market_data row for {asset_id}: " f"price={price!r}, sentiment={sentiment_score!r}, ts={data_timestamp!r}")
             
@@ -491,8 +490,7 @@ async def perform_analysis(ctx: Context, asset_id: str, timestamp: str):
             request = AnalysisRequest(
                 asset_id=asset_id,
                 timestamp=timestamp,
-                current_data=current_data,
-                historical_data=historical_data
+                current_data=current_data
             )
             
             # Send the request to the strategy agent

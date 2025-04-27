@@ -4,6 +4,7 @@ import yfinance as yf
 from datetime import datetime
 import requests
 import numpy as np
+import random
 
 
 try:
@@ -108,7 +109,11 @@ def analyze_news_sentiment(ticker: str) -> Dict:
     
     # Process each news item
     sentiment_scores = []
-    for item in news[:15]:  # Get top 15 news items
+    if len(news) > 30:
+        sampled_news = random.sample(news, 30)
+    else:
+        sampled_news = news
+    for item in sampled_news:  # Get top 15 news items
         try:
             summary = item.get('content','').get('title', '')
             if 'summary' in item:
@@ -129,16 +134,15 @@ def analyze_news_sentiment(ticker: str) -> Dict:
     if sentiment_scores:
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores)
         sentiment_magnitude = sum(abs(score) for score in sentiment_scores) / len(sentiment_scores)
-        news_count = len(sentiment_scores)
+        # news_count = len(sentiment_scores)
     else:
         avg_sentiment = 0.0
         sentiment_magnitude = 0.0
-        news_count = 0
+        # news_count = 0
     
     return {
         "sentiment_score": avg_sentiment,
-        "sentiment_magnitude": sentiment_magnitude,
-        "news_count": news_count
+        "sentiment_magnitude": sentiment_magnitude
     }
 
 @sentiment_agent.on_message(SentimentRequest)
@@ -158,7 +162,7 @@ async def handle_request(ctx: Context, sender: str, msg: SentimentRequest):
                 timestamp=timestamp,
                 sentiment_score=float(sentiment_data["sentiment_score"]),
                 sentiment_magnitude=float(sentiment_data["sentiment_magnitude"]),
-                news_count=sentiment_data["news_count"]
+                # news_count=sentiment_data["news_count"]
             )
         )
         ctx.logger.info(f"Sent sentiment data for {msg.ticker}: {sentiment_data}")

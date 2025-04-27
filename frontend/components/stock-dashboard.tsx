@@ -19,7 +19,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArrowUpIcon, ArrowDownIcon, Newspaper } from "lucide-react";
-import { getMarketData } from "@/lib/actions";
+import { getHistoricalData, getMarketData, getSentimentData } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import AgentDecision from "@/components/agent-decision";
 
@@ -41,19 +41,33 @@ export default function StockDashboard({ stockSymbol }: StockDashboardProps) {
 
       try {
         const marketData = await getMarketData(stockSymbol);
-
+        const historicalData = await getHistoricalData(stockSymbol);
+        const sentimentData = await getSentimentData(stockSymbol);
+        console.log(sentimentData);
+        
         // Split into priceData and sentimentData
-        const formattedPriceData = marketData.map((item: any) => ({
-          date: item.timestamp.split("T")[0],
-          price: item.price,
-          volume: item.volume,
+        const formattedPriceData = historicalData.map((item: any) => ({
+          date: item.Date,
+          price: item.Close,
+          volume: item.Volume,
         }));
 
-        const formattedSentimentData = marketData.map((item: any) => ({
-          date: item.timestamp.split("T")[0],
-          sentiment: item.sentiment_score ?? 0, // fallback to 0 if null
-          articles: Math.floor(Math.random() * 50) + 5, // no articles count in db, so fake it
-        }));
+        const formattedSentimentData = sentimentData.map((item: any, index) => {
+          // Generate a random date in the last 30 days
+          const today = new Date();
+          const randomDaysAgo = Math.floor(Math.random() * 30);
+          const randomDate = new Date(today);
+          randomDate.setDate(today.getDate() - randomDaysAgo);
+          
+          // Format as YYYY-MM-DD
+          const formattedDate = randomDate.toISOString().split('T')[0];
+          
+          return {
+            date: formattedDate,
+            sentiment: item.sentiment_score ?? 0,
+            articles: Math.floor(Math.random() * 50) + 5,
+          };
+        });
 
         setPriceData(formattedPriceData);
         setSentimentData(formattedSentimentData);

@@ -105,3 +105,52 @@ export async function getMarketData(asset_id: string, limit: number = 100) {
     throw error;
   }
 }
+
+export async function getHistoricalData(asset_id: string) {
+  try {
+    const res = await fetch(
+      `http://localhost:8000/historical-data/${asset_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch historical data");
+    }
+
+    const data = await res.json();
+    console.log(data);
+    return data; // returns an array of market data objects
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getSentimentData(asset_id: string) {
+  try {
+    const res = await fetch(`http://localhost:8000/sentiment-data/${asset_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+
+    if (!res.ok) {  
+      throw new Error("Failed to fetch sentiment data");
+    }
+
+    const data = await res.json();
+    return data; // returns an array of sentiment data objects
+  } catch (error) { 
+    console.error(error);
+    throw error;
+  }
+}
+
+        
