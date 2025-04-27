@@ -1,4 +1,4 @@
-// File: /Users/raphael/Documents/myquant/frontend/app/page.tsx
+// File: C:\Users\jsty0\Documents\Github\myquant\frontend\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,4 +1,5 @@
 # src/api/main.py
+import random
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -70,6 +71,7 @@ class MarketData(BaseModel):
     sentiment_score: Optional[float] = None
     sentiment_magnitude: Optional[float] = None
     currency: str = "USD"
+    historical_data: Optional[Dict[str, Any]] = None
     source: str = "system"
 
 class Prediction(BaseModel):
@@ -202,7 +204,7 @@ async def create_market_data(data: MarketData):
             """, (
                 data.asset_id, data.timestamp, data.price, data.volume,
                 data.sentiment_score, data.sentiment_magnitude,
-                data.currency, data.source
+                data.currency, data.source, data.historical_data
             ))
             result = cur.fetchone()
             conn.commit()
@@ -237,7 +239,60 @@ async def get_market_data(asset_id: str, limit: int = 30):
     finally:
         conn.close()
 
+@app.get("/sentiment-data/{asset_id}")
+async def get_sentiment_data(asset_id: str, limit: int = 30):
+    conn = get_db_connection()
+    try:
 
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT 
+                    DATE(timestamp) as day,
+                    AVG(sentiment_score) as avg_sentiment,
+                    AVG(sentiment_magnitude) as avg_magnitude
+                FROM market_data
+                WHERE asset_id = %s
+                GROUP BY DATE(timestamp)
+                ORDER BY day DESC
+                LIMIT %s
+            """, (asset_id, limit))
+            
+            return [
+                {
+                    "timestamp": row[0].isoformat(),  # This will be just the date part
+                    "sentiment_score": float(row[1]) if row[1] else 0,
+                    "sentiment_magnitude": float(row[2]) if row[2] else 0
+                }
+                for row in cur.fetchall()
+            ]
+    finally:
+        conn.close()
+
+
+@app.get("/historical-data/{asset_id}")
+async def get_historical_data(asset_id: str):
+    conn = get_db_connection()
+    try:
+        # Your code to fetch data
+        import yfinance as yf
+        
+        stock = yf.Ticker(asset_id)
+        
+        hist = stock.history(period="1mo")
+        
+        # Convert to JSON-compatible format
+        hist = hist.reset_index()
+        
+        # Convert datetime columns to string
+        for col in hist.select_dtypes(include=['datetime64']).columns:
+            hist[col] = hist[col].dt.strftime('%Y-%m-%d')
+        
+        # Convert to list of dictionaries
+        result = hist.to_dict(orient='records')
+        
+        return result
+    finally:
+        conn.close()
 
 @app.post("/predictions")
 async def create_prediction(prediction: Prediction):
@@ -460,12 +515,12 @@ async def test_db():
 #         raise HTTPException(status_code=400, detail="Invalid ticker or no company name found")
 def fetch_company_name(ticker: str) -> str:
     """
-    Given a stock ticker, returns the company’s longName or shortName.
+    Given a stock ticker, returns the company's longName or shortName.
     Raises HTTPException(400) if the ticker is invalid or name not found.
     """
     try:
         tk = yf.Ticker(ticker)
-        info = tk.info  # pulls the “quoteSummary” data for you
+        info = tk.info  # pulls the "quoteSummary" data for you
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Failed to fetch data for {ticker}: {e}")
 

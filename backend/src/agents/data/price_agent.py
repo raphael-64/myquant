@@ -52,7 +52,6 @@ async def handle_request(ctx: Context, sender: str, msg: PriceRequest):
             
         currency = stock.info.get('currency', 'USD')
         volume = stock.info.get('volume', 0)
-
         
         # timestamp = datetime.now().isoformat()    # 1. generate a single, UTC, second‐precision timestamp
         ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
