@@ -45,9 +45,9 @@ export default function AgentDecision({
   });
 
   const [weights, setWeights] = useState({
-    meanReversion: 0.33,
-    momentum: 0.33,
-    sentimentMomentum: 0.34,
+    meanReversion: 0.19,
+    momentum: 0.35,
+    sentimentMomentum: 0.46,
   });
 
   useEffect(() => {
@@ -125,9 +125,9 @@ export default function AgentDecision({
   const getActionColor = (action: string) => {
     switch (action) {
       case "buy":
-        return "text-green-500";
+        return "text-[#86A5A5]";
       case "sell":
-        return "text-red-500";
+        return "text-[#B35D5D]";
       default:
         return "text-yellow-500";
     }
@@ -168,7 +168,7 @@ export default function AgentDecision({
               <CardHeader className="py-2">
                 <CardTitle className="text-sm flex items-center">
                   <LineChart className="mr-2 h-4 w-4" />
-                  Mean Reversion Agent
+                  Mean Regression Agent
                 </CardTitle>
               </CardHeader>
               <CardContent className="py-1">
@@ -246,12 +246,14 @@ export default function AgentDecision({
 
           <Card className="bg-muted/50">
             <CardHeader className="py-4">
-              <CardTitle className="text-center">Final Decision</CardTitle>
+              <CardTitle className="text-sm text-center">
+                Final Decision
+              </CardTitle>
             </CardHeader>
             <CardContent className="py-2">
               <div className="flex flex-col items-center justify-center">
                 <div
-                  className={`text-4xl font-bold uppercase ${getActionColor(
+                  className={`text-sm font-bold uppercase ${getActionColor(
                     finalDecision.action
                   )} flex items-center`}
                 >
@@ -259,14 +261,16 @@ export default function AgentDecision({
                   {finalDecision.action}
                 </div>
                 <div className="mt-4 w-full space-y-1">
-                  <div className="text-sm text-center">Confidence</div>
+                  <div className="text-sm text-center">
+                    Confidence {(finalDecision.confidence * 100).toFixed(0)}%
+                  </div>
                   <Progress
                     value={finalDecision.confidence * 100}
                     className="h-3"
                   />
-                  <div className="text-sm text-center text-muted-foreground">
+                  {/* <div className="text-sm text-center text-muted-foreground">
                     {(finalDecision.confidence * 100).toFixed(0)}%
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </CardContent>

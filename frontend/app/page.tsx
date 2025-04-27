@@ -20,6 +20,9 @@ export default function Home() {
   const [activeStock, setActiveStock] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Compute total net worth as sum of each asset's currentValue
+  // const netWorth = stocks.reduce((sum, stock) => sum + (stock.price || 0), 0);
+
   useEffect(() => {
     // Load saved stocks from localStorage
     fetch("http://localhost:8000/assets")
@@ -126,30 +129,45 @@ export default function Home() {
   // void changeActiveStock();
 
   return (
-    <main className="container mx-auto py-3">
-      <h1 className="text-2xl font-bold mb-3">MyQuant</h1>
-      <h2 className="text-2xl font-bold mb-3">
-        Self-Evolving Multi-Agent Trading Platform
-      </h2>
+    <main className="container mx-auto pt-5 pb-2">
+      <h1
+        className="text-4xl font-semibold mb-2 text-center tracking-tight"
+        style={{
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        }}
+      >
+        MyQuant
+      </h1>
 
-      <div className="flex items-center space-x-4 mb-4 bg-muted/30 p-2 rounded-lg">
-        <div className="flex-grow flex space-x-2">
+      <div className="flex items-center justify-between mb-4 bg-muted/30 p-2 rounded-lg w-full">
+        <div className="flex items-center space-x-3">
           <Input
             placeholder="Add stock ticker (e.g., AAPL, TSLA)"
             value={newStock}
             onChange={(e) => setNewStock(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddStock()}
-            className="h-9"
+            className="h-9 w-72 text-2xl text-center"
             list="all-stocks"
           />
-          <Button onClick={handleAddStock} size="sm" className="h-9">
-            <Plus className="mr-1 h-4 w-4" /> Add
+          <Button
+            onClick={handleAddStock}
+            size="sm"
+            className="h-9 bg-[#2a2a2a] text-white"
+          >
+            <Plus className="mr-1 h-4 w-4" />
+            Add
           </Button>
         </div>
 
+        <h2 className="text-1xl font-bold text-center mx-2.5">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self-Evolving
+          Multi-Agent Trading Platform
+        </h2>
+
         <div className="flex items-center space-x-3 px-3 border-l border-border">
           <div className="text-xs">
-            <span className="font-medium">Market Research:</span> 2 agents
+            <span className="font-medium"> Market Research:</span> 2 agents
           </div>
           <div className="text-xs">
             <span className="font-medium">Analysis:</span> 3 agents
@@ -165,13 +183,15 @@ export default function Home() {
           <div
             key={stock.ticker}
             onClick={() => setActiveStock(stock.ticker)}
-            className="flex items-center bg-muted rounded-md px-3 py-1 cursor-pointer"
+            className="flex items-center bg-[#5D7272] rounded-md px-3 py-1 cursor-pointer"
           >
-            <span className="font-medium mr-2">{stock.name}</span>
+            <span className="font-medium text-xs mr-2 text-white ">
+              {stock.name}
+            </span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
+              className="h-6 w-6 text-xs font-medium text-white text-center"
               onClick={(e) => {
                 e.stopPropagation(); // stop triggering setActiveStock when clicking trash
                 handleRemoveStock(stock.ticker);
