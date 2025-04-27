@@ -131,7 +131,7 @@ export default function Home() {
   return (
     <main className="container mx-auto pt-5 pb-2">
       <h1
-        className="text-4xl font-semibold mb-2 text-center tracking-tight"
+        className="text-4xl font-semibold mb-4 text-center tracking-tight"
         style={{
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',

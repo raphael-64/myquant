@@ -1,28 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { ArrowUpIcon, ArrowDownIcon, Newspaper } from "lucide-react";
 import {
   getHistoricalData,
-  Plus,
-  Trash2,
+  getMarketData,
   getSentimentData,
-} from "lucide-react";
+} from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
+import AgentDecision from "@/components/agent-decision";
 
-import StockDashboard from "@/components/stock-dashboard";
-import AgentWeightsChart from "@/components/agent-weights-chart";
-import AgentPerformanceChart from "@/components/agent-performance-chart";
-import { addStock, removeStock } from "@/lib/actions";
+interface StockDashboardProps {
+  stockSymbol: string;
+}
 
-export default function Home() {
-  const [data, setData] = useState(null);
-  const [stocks, setStocks] = useState<{ ticker: string; name?: string }[]>([]);
-  const [newStock, setNewStock] = useState("");
-  const [activeStock, setActiveStock] = useState<string | null>(null);
+export default function StockDashboard({ stockSymbol }: StockDashboardProps) {
+  const [priceData, setPriceData] = useState<any[]>([]);
+  const [sentimentData, setSentimentData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,22 +45,36 @@ export default function Home() {
 
       try {
         const marketData = await getMarketData(stockSymbol);
+        const historicalData = await getHistoricalData(stockSymbol);
+        // const sentimentData = await getSentimentData(stockSymbol);
+        // console.log(sentimentData);
 
         // Split into priceData and sentimentData
-        const formattedPriceData = marketData.map((item: any) => ({
-          date: item.timestamp.split("T")[0],
-          price: item.price,
-          volume: item.volume,
+        const formattedPriceData = historicalData.map((item: any) => ({
+          date: item.Date,
+          price: item.Close,
+          volume: item.Volume,
         }));
 
-        const formattedSentimentData = marketData.map((item: any) => ({
-          date: item.timestamp.split("T")[0],
-          sentiment: item.sentiment_score ?? 0, // fallback to 0 if null
-          articles: Math.floor(Math.random() * 50) + 5, // no articles count in db, so fake it
-        }));
+        // const formattedSentimentData = sentimentData.map((item: any, index) => {
+        //   // Generate a random date in the last 30 days
+        //   const today = new Date();
+        //   const randomDaysAgo = Math.floor(Math.random() * 30);
+        //   const randomDate = new Date(today);
+        //   randomDate.setDate(today.getDate() - randomDaysAgo);
+
+        //   // Format as YYYY-MM-DD
+        //   const formattedDate = randomDate.toISOString().split("T")[0];
+
+        //   return {
+        //     date: formattedDate,
+        //     sentiment: item.sentiment_score ?? 0,
+        //     articles: Math.floor(Math.random() * 50) + 5,
+        //   };
+        // });
 
         setPriceData(formattedPriceData);
-        setSentimentData(formattedSentimentData);
+        // setSentimentData(formattedSentimentData);
       } catch (err) {
         setError("Failed to fetch stock data");
         toast({
@@ -86,19 +113,19 @@ export default function Home() {
     }
 
     // Mock sentiment data
-    if (sentimentData.length === 0) {
-      const mockSentimentData = Array.from({ length: 30 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - (30 - i));
+    // if (sentimentData.length === 0) {
+    const mockSentimentData = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (30 - i));
 
-        return {
-          date: date.toISOString().split("T")[0],
-          sentiment: Math.random() * 2 - 1, // -1 to 1
-          articles: Math.floor(Math.random() * 50) + 5,
-        };
-      });
-      setSentimentData(mockSentimentData);
-    }
+      return {
+        date: date.toISOString().split("T")[0],
+        sentiment: Math.random() * 2 - 1, // -1 to 1
+        articles: Math.floor(Math.random() * 50) + 5,
+      };
+    });
+    setSentimentData(mockSentimentData);
+    // }
   }, [stockSymbol, priceData.length, sentimentData.length]);
 
   const currentPrice =
@@ -123,125 +150,156 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto py-3">
-      <h1 className="text-2xl font-bold mb-3">MyQuant</h1>
-      <h2 className="text-2xl font-bold mb-3">
-        Self-Evolving Multi-Agent Trading Platform
-      </h2>
-
-      <div className="flex items-center space-x-4 mb-4 bg-muted/30 p-2 rounded-lg">
-        <div className="flex-grow flex space-x-2">
-          <Input
-            placeholder="Add stock ticker (e.g., AAPL, TSLA)"
-            value={newStock}
-            onChange={(e) => setNewStock(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddStock()}
-            className="h-9"
-            list="all-stocks"
-          />
-          <Button onClick={handleAddStock} size="sm" className="h-9">
-            <Plus className="mr-1 h-4 w-4" /> Add
-          </Button>
-        </div>
-
-        <div className="flex items-center space-x-3 px-3 border-l border-border">
-          <div className="text-xs">
-            <span className="font-medium">Market Research:</span> 2 agents
-          </div>
-          <div className="text-xs">
-            <span className="font-medium">Analysis:</span> 3 agents
-          </div>
-          <div className="text-xs">
-            <span className="font-medium">Self-learning:</span> Active
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        {stocks.map((stock) => (
-          <div
-            key={stock.ticker}
-            onClick={() => setActiveStock(stock.ticker)}
-            className="flex items-center bg-muted rounded-md px-3 py-1 cursor-pointer"
-          >
-            <span className="font-medium mr-2">{stock.name}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={(e) => {
-                e.stopPropagation(); // stop triggering setActiveStock when clicking trash
-                handleRemoveStock(stock.ticker);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      {activeStock ? (
-        <>
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-9">
-              <TabsTrigger value="dashboard" className="text-xs">
-                Stock Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="weights" className="text-xs">
-                Agent Weights
-              </TabsTrigger>
-              <TabsTrigger value="performance" className="text-xs">
-                Agent Performance
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard">
-              <div className="mb-2">
-                <div className="flex space-x-1 overflow-x-auto py-1">
-                  {/* {stocks.map((stock) => (
-                    <Button
-                      key={stock}
-                      variant={activeStock === stock ? "default" : "outline"}
-                      onClick={() => setActiveStock(stock)}
-                      size="sm"
-                      className="h-7 px-2 py-0"
-                    >
-                      {stock}
-                    </Button>
-                  ))} */}
-                  {/* <div>
-                    {stocks.map((stock) => (
-                      <Button key={stock}>{stock}</Button>
-                    ))}
-                  </div> */}
-                </div>
-              </div>
-
-              <StockDashboard stockSymbol={activeStock} />
-            </TabsContent>
-
-            <TabsContent value="weights">
-              <AgentWeightsChart stockSymbol={activeStock} />
-            </TabsContent>
-
-            <TabsContent value="performance">
-              <AgentPerformanceChart stockSymbol={activeStock} />
-            </TabsContent>
-          </Tabs>
-        </>
-      ) : (
+    <div className="grid gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-10">
-              <h3 className="text-lg font-medium mb-2">No Stocks Added</h3>
-              <p className="text-muted-foreground mb-4">
-                Add stocks above to start tracking and analyzing them with the
-                multi-agent system.
-              </p>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl">{stockSymbol}</CardTitle>
+            <CardDescription>Price and Volume Analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold">
+                {formatPrice(currentPrice)}
+              </div>
+              <div
+                className={`flex items-center ${
+                  priceChange >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {priceChange >= 0 ? (
+                  <ArrowUpIcon className="mr-1 h-4 w-4" />
+                ) : (
+                  <ArrowDownIcon className="mr-1 h-4 w-4" />
+                )}
+                <span className="font-medium">
+                  {priceChange.toFixed(2)} ({priceChangePercent.toFixed(2)}%)
+                </span>
+              </div>
+            </div>
+
+            <div className="h-[160px] mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={priceData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.getMonth() + 1}/${date.getDate()}`;
+                    }}
+                  />
+                  <YAxis domain={["auto", "auto"]} />
+                  <Tooltip
+                    formatter={(value: any) => [formatPrice(value), "Price"]}
+                    labelFormatter={(label) => {
+                      const date = new Date(label);
+                      return date.toLocaleDateString();
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-      )}
-    </main>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center">
+              <Newspaper className="mr-2 h-5 w-5" />
+              Market Sentiment
+            </CardTitle>
+            <CardDescription>
+              Research agents for news/social media
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="text-sm text-muted-foreground">
+                  Current Sentiment
+                </div>
+                <div className="flex items-center mt-1">
+                  <Badge
+                    variant={
+                      currentSentiment > 0.3
+                        ? "success"
+                        : currentSentiment < -0.3
+                        ? "destructive"
+                        : "outline"
+                    }
+                  >
+                    {currentSentiment > 0.3
+                      ? "Positive"
+                      : currentSentiment < -0.3
+                      ? "Negative"
+                      : "Neutral"}
+                  </Badge>
+                  <span className="ml-2 text-sm">
+                    {(currentSentiment * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">
+                  Articles Analyzed
+                </div>
+                <div className="text-xl font-medium mt-1">
+                  {sentimentData.length > 0
+                    ? sentimentData[sentimentData.length - 1].articles
+                    : 0}
+                </div>
+              </div>
+            </div>
+
+            <div className="h-[160px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={sentimentData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.getMonth() + 1}/${date.getDate()}`;
+                    }}
+                  />
+                  <YAxis domain={[-1, 1]} />
+                  <Tooltip
+                    formatter={(value: any) => [
+                      `${(value * 100).toFixed(1)}%`,
+                      "Sentiment",
+                    ]}
+                    labelFormatter={(label) => {
+                      const date = new Date(label);
+                      return date.toLocaleDateString();
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="sentiment"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <AgentDecision
+        stockSymbol={stockSymbol}
+        priceData={priceData}
+        sentimentData={sentimentData}
+      />
+    </div>
   );
 }
